@@ -23,6 +23,8 @@ class MenuShip(Ship):
         self.is_bought = False
         self.is_selected = False
         self.has_button = False
+        self.move_right = False
+        self.move_left = False
 
     def create_button(self, path, text):
         """
@@ -65,3 +67,30 @@ class MenuShip(Ship):
             self.button.draw_button()
         if not self.is_bought:
             self.button.draw_button()
+
+    def update(self):
+        """
+        Updates the ship's position.
+        :return: None
+        """
+        if self.move_left:
+            self.background_rect.x -= 50
+            self.image_rect.x -= 50
+            if self.is_selected:
+                self.selected_text_rect.x -= 50
+            if not self.is_selected and self.is_bought:
+                self.button.update_button(False)
+            if not self.is_bought:
+                self.button.update_button(False)
+            self.move_left = False
+
+        elif self.move_right:
+            self.background_rect.x += 50
+            self.image_rect.x += 50
+            if self.is_selected:
+                self.selected_text_rect.x += 50
+            if not self.is_selected and self.is_bought:
+                self.button.update_button(True)
+            if not self.is_bought:
+                self.button.update_button(True)
+            self.move_right = False

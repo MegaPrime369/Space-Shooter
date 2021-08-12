@@ -27,3 +27,44 @@ class Button:
     def draw_button(self):
         self.screen.blit(self.image, self.image_rect)
         self.screen.blit(self.text_image, self.text_image_rect)
+
+    def update_button(self, move_right):
+        """
+        Updates the position of the button.
+        :param move_right: Boolean
+        :return: None
+        """
+        if move_right:
+            self.image_rect.x += 50
+            self.text_image_rect.x += 50
+        else:
+            self.image_rect.x -= 50
+            self.text_image_rect.x -= 50
+
+
+class ImageButton:
+    def __init__(self, screen, image, button_path, button_size):
+        """
+        Initialises Attributes for button with image.
+        :param screen: pygame Surface
+        :param image: pygame Surface
+        :param button_path: String
+        :param button_size: Tuple
+        """
+        # Screen:-
+        self.screen = screen
+        # Image attributes:-
+        self.image = image
+        self.image_rect = self.image.get_rect()
+        # Button attributes:-
+        self.button = pygame.image.load(button_path)
+        self.button = pygame.transform.scale(self.button, button_size).convert_alpha()
+        self.button_rect = self.button.get_rect()
+
+    def draw_image_button(self):
+        """
+        Draws the button to the screen.
+        :return: None
+        """
+        self.screen.blit(self.button, self.button_rect)
+        self.screen.blit(self.image, self.image_rect)

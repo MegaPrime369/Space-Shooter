@@ -2,6 +2,7 @@ import pygame
 import sys
 from settings import Settings
 from ship import MenuShip
+from button import ImageButton
 import json
 
 
@@ -37,6 +38,8 @@ class Menu:
         pygame.mouse.set_visible(False)
         # Getting the cursor image:-
         self.cursor = pygame.image.load('Game Assets/PNG/UI/cursor.png')
+        # Creating buttons:-
+        self.create_buttons()
         # Creating the clock to set fps:-
         self.clock = pygame.time.Clock()
 
@@ -139,6 +142,21 @@ class Menu:
                 self.ships.add(ship)
                 ship_number += 1
 
+    def check_button_press(self):
+        """
+        Checks if the buttons in the menu has been pressed.
+        :return: None
+        """
+        # mouse_pos:-
+        mouse_pos = pygame.mouse.get_pos()
+        # Checks if the button which moves the ships right has been pressed:-
+        if self.ship_right_button.button_rect.collidepoint(mouse_pos):
+            for ship in self.ships:
+                ship.move_right = True
+        if self.ship_left_button.button_rect.collidepoint(mouse_pos):
+            for ship in self.ships:
+                ship.move_left = True
+
     def check_mouse_click(self):
         """
         Respond to mouse clicks.
@@ -161,6 +179,30 @@ class Menu:
                     self.ships.empty()
                     self.create_ship()
 
+    def create_buttons(self):
+        """
+        Creates button for moving the images in the menu.
+        :return: None
+        """
+        button_size = (100, 30)
+        arrow_size = (50, 10)
+        button_path = 'Game Assets/PNG/UI/buttonYellow.png'
+        # Creating the button that will move the ships to left:-
+        left_arrow = pygame.image.load('Game Assets/PNG/arrow.png')
+        left_arrow = pygame.transform.scale(left_arrow, arrow_size)
+        left_arrow = pygame.transform.rotate(left_arrow, 180).convert_alpha()
+        self.ship_left_button = ImageButton(self.screen, left_arrow, button_path, button_size)
+        self.ship_left_button.button_rect.left = self.screen_rect.left + 10
+        self.ship_left_button.button_rect.top = self.ships.sprites()[0].background_rect.bottom + 10
+        self.ship_left_button.image_rect.center = self.ship_left_button.button_rect.center
+        # Creating the buttons that will move the the ships to the right:-
+        right_arrow = pygame.image.load('Game Assets/PNG/arrow.png')
+        right_arrow = pygame.transform.smoothscale(right_arrow, arrow_size).convert_alpha()
+        self.ship_right_button = ImageButton(self.screen, right_arrow, button_path, button_size)
+        self.ship_right_button.button_rect.right = self.screen_rect.right - 10
+        self.ship_right_button.button_rect.top = self.ship_left_button.button_rect.top
+        self.ship_right_button.image_rect.center = self.ship_right_button.button_rect.center
+
     def check_events(self):
         """
         Checks for key presses and mouse clicks.
@@ -173,6 +215,7 @@ class Menu:
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.check_mouse_click()
+                self.check_button_press()
 
     def update_screen(self):
         """
@@ -192,6 +235,11 @@ class Menu:
         fps_rect = fps_image.get_rect()
         fps_rect.right, fps_rect.bottom = self.settings.screen_width, self.settings.screen_height
         self.screen.blit(fps_image, fps_rect)
+        # Drawing the buttons:-
+        self.ship_left_button.draw_image_button()
+        self.ship_right_button.draw_image_button()
+        # Updating the ships:-
+        self.ships.update()
         # Showing the cursor:-
         self.screen.blit(self.cursor, pygame.mouse.get_pos())
         # Updating the display:-
