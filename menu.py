@@ -150,11 +150,15 @@ class Menu:
         # mouse_pos:-
         mouse_pos = pygame.mouse.get_pos()
         # Checks if the button which moves the ships right has been pressed:-
-        if self.ship_right_button.button_rect.collidepoint(mouse_pos):
-            for ship in self.ships:
+        if self.ship_right_button.button_rect.collidepoint(mouse_pos) and self.ships.sprites()[
+            0].background_rect.centerx < self.ships.sprites()[0].background_rect.width:
+            for ship in self.ships.sprites():
                 ship.move_right = True
-        if self.ship_left_button.button_rect.collidepoint(mouse_pos):
-            for ship in self.ships:
+        # Checks if the button which moves the ships left has been presses:-
+        if self.ship_left_button.button_rect.collidepoint(mouse_pos) and (
+                self.screen_rect.right - self.ships.sprites()[11].background_rect.centerx) < self.ships.sprites()[
+            0].background_rect.width:
+            for ship in self.ships.sprites():
                 ship.move_left = True
 
     def check_mouse_click(self):
