@@ -51,13 +51,13 @@ class Menu:
         """
         # Getting the status of the ships from the json files:-
         # Getting the ship which is in use:-
-        with open('Data/in_use.json') as in_use:
+        with open('Data/Ship Data/in_use.json') as in_use:
             selected_ship = json.load(in_use)
         # Getting the list of ships bought:-
-        with open('Data/is_bought.json') as is_bought:
+        with open('Data/Ship Data/is_bought.json') as is_bought:
             ships_bought = json.load(is_bought)
         # Getting the list of ships available:-
-        with open('Data/is_available.json') as is_available:
+        with open('Data/Ship Data/is_available.json') as is_available:
             ships_available = json.load(is_available)
 
         return selected_ship, ships_bought, ships_available
@@ -78,6 +78,9 @@ class Menu:
             # Setting the position of the selected text:-
         if ship_path in ships_bought:
             ship.is_bought = True
+        if ship_path not in ships_bought:
+            # Showing the price.
+            self.add_ship_text(ship)
         if ship_path in ships_available:
             ship.is_available = True
 
@@ -87,13 +90,17 @@ class Menu:
     @staticmethod
     def add_ship_text(ship):
         """
-        Adds 'selected' text to the ship selected.
+        Adds 'selected' text to the ship selected and show price.
         :param ship: Object
         :return: None
         """
         ship.prep_texts()
-        ship.selected_text_rect.centerx = ship.image_rect.centerx
-        ship.selected_text_rect.centery = ship.image_rect.bottom + 30
+        if ship.is_selected:
+            ship.selected_text_rect.centerx = ship.image_rect.centerx
+            ship.selected_text_rect.centery = ship.image_rect.bottom + 30
+        if not ship.is_bought:
+            ship.price_rect.centerx = ship.image_rect.centerx
+            ship.price_rect.centery = ship.image_rect.bottom + 30
 
     @staticmethod
     def add_ship_button(ship_path, ship, ship_info):
@@ -108,14 +115,14 @@ class Menu:
         if ship_path in ships_bought and ship_path not in selected_ship:
             ship.create_button('Game Assets/PNG/UI/buttonBlue.png', 'Select')
             ship.button.image_rect.centerx = ship.image_rect.centerx
-            ship.button.image_rect.centery = ship.image_rect.bottom + 30
+            ship.button.image_rect.centery = ship.image_rect.bottom + 50
             ship.button.text_image_rect.center = ship.button.image_rect.center
             ship.has_button = True
 
         if ship_path not in ships_bought:
             ship.create_button('Game Assets/PNG/UI/buttonBlue.png', 'Buy')
             ship.button.image_rect.centerx = ship.image_rect.centerx
-            ship.button.image_rect.centery = ship.image_rect.bottom + 30
+            ship.button.image_rect.centery = ship.image_rect.bottom + 60
             ship.button.text_image_rect.center = ship.button.image_rect.center
             ship.has_button = True
 
@@ -131,10 +138,11 @@ class Menu:
                 # Getting the path of the ship image:-
                 ship_path = f'Game Assets/PNG/playerShip{i}_{color}.png'
                 # Making the ship.
-                ship = MenuShip(ship_path, (80, 80), 'Game Assets/PNG/UI/buttonRed.png', self.screen)
+                ship = MenuShip(str((ship_number + 1) * 1000), ship_path, (80, 80), 'Game Assets/PNG/UI/buttonRed.png',
+                                self.screen)
                 # Setting the position of the ship.
                 ship.image_rect.x = ship.image_rect.width + 2 * ship_number * ship.image_rect.width
-                ship.image_rect.y = self.screen_rect.top + 120
+                ship.image_rect.y = self.screen_rect.top + 150
                 # Setting the position of the background:-
                 ship.background_rect.centerx = ship.image_rect.centerx
                 ship.background_rect.centery = ship.image_rect.centery + 20
@@ -169,16 +177,16 @@ class Menu:
         for ship in self.ships.sprites():
             if ship.check_button_click(pygame.mouse.get_pos()):
                 if ship.is_bought and not ship.is_selected:
-                    with open('Data/in_use.json', 'w') as selected_file:
+                    with open('Data/Ship Data/in_use.json', 'w') as selected_file:
                         json.dump(ship.image_path, selected_file)
                     self.ships.empty()
                     self.create_ship()
 
                 if not ship.is_bought:
-                    with open('Data/is_bought.json', 'r') as bought_file:
+                    with open('Data/Ship Data/is_bought.json', 'r') as bought_file:
                         bought_list = json.load(bought_file)
                         bought_list.append(ship.image_path)
-                    with open('Data/is_bought.json', 'w') as bought_file:
+                    with open('Data/Ship Data/is_bought.json', 'w') as bought_file:
                         json.dump(bought_list, bought_file)
                     self.ships.empty()
                     self.create_ship()

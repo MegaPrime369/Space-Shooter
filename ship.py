@@ -1,6 +1,7 @@
 import pygame
 from pygame.sprite import Sprite
 from button import Button
+from settings import Settings
 
 
 class Ship(Sprite):
@@ -13,10 +14,10 @@ class Ship(Sprite):
 
 
 class MenuShip(Ship):
-    def __init__(self, img_path, size, background_path, screen):
+    def __init__(self, price, img_path, size, background_path, screen):
         super().__init__(img_path, size)
         self.background = pygame.image.load(background_path)
-        self.background = pygame.transform.scale(self.background, (size[0] + 30, size[1] + 100)).convert_alpha()
+        self.background = pygame.transform.scale(self.background, (size[0] + 40, size[1] + 150)).convert_alpha()
         self.background_rect = self.background.get_rect()
         self.screen = screen
         self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 15)
@@ -25,6 +26,9 @@ class MenuShip(Ship):
         self.has_button = False
         self.move_right = False
         self.move_left = False
+        self.price = price
+        self.settings = Settings()
+        self.update_magnitude = self.settings.update_magnitude
 
     def create_button(self, path, text):
         """
@@ -33,7 +37,7 @@ class MenuShip(Ship):
         :param path: String
         :return: None
         """
-        self.button = Button(self.screen, text, (70, 30), path, 15)
+        self.button = Button(self.settings, self.screen, text, (70, 30), path, 15)
 
     def check_button_click(self, mouse_pos):
         """
@@ -49,8 +53,12 @@ class MenuShip(Ship):
         Preparing the texts.
         :return:
         """
+        # Creating the 'selected' text image:-
         self.selected_text_image = self.font.render('Selected', True, (2, 51, 184))
         self.selected_text_rect = self.selected_text_image.get_rect()
+        # Creating the price of the ship image from the text:-
+        self.price_image = self.font.render(self.price, True, (0, 0, 0))
+        self.price_rect = self.price_image.get_rect()
 
     def draw_ships(self):
         """
@@ -67,6 +75,8 @@ class MenuShip(Ship):
             self.button.draw_button()
         if not self.is_bought:
             self.button.draw_button()
+            # Showing the price:-
+            self.screen.blit(self.price_image, self.price_rect)
 
     def update(self):
         """
@@ -74,23 +84,25 @@ class MenuShip(Ship):
         :return: None
         """
         if self.move_left:
-            self.background_rect.x -= 50
-            self.image_rect.x -= 50
+            self.background_rect.x -= self.update_magnitude
+            self.image_rect.x -= self.update_magnitude
             if self.is_selected:
-                self.selected_text_rect.x -= 50
+                self.selected_text_rect.x -= self.update_magnitude
             if not self.is_selected and self.is_bought:
                 self.button.update_button(False)
             if not self.is_bought:
                 self.button.update_button(False)
+                self.price_rect.x -= self.update_magnitude
             self.move_left = False
 
         elif self.move_right:
-            self.background_rect.x += 50
-            self.image_rect.x += 50
+            self.background_rect.x += self.update_magnitude
+            self.image_rect.x += self.update_magnitude
             if self.is_selected:
-                self.selected_text_rect.x += 50
+                self.selected_text_rect.x += self.update_magnitude
             if not self.is_selected and self.is_bought:
                 self.button.update_button(True)
             if not self.is_bought:
                 self.button.update_button(True)
+                self.price_rect.x += self.update_magnitude
             self.move_right = False

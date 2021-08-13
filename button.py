@@ -2,7 +2,7 @@ import pygame
 
 
 class Button:
-    def __init__(self, screen, text, button_size, path, text_size):
+    def __init__(self, settings, screen, text, button_size, path, text_size):
         """
         Creates button.
         :param screen: pygame.Surface
@@ -23,6 +23,8 @@ class Button:
         self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', self.text_size)
         self.text_image = self.font.render(self.text, True, (235, 58, 9))
         self.text_image_rect = self.text_image.get_rect()
+        # Settings:-
+        self.settings = settings
 
     def draw_button(self):
         self.screen.blit(self.image, self.image_rect)
@@ -35,11 +37,11 @@ class Button:
         :return: None
         """
         if move_right:
-            self.image_rect.x += 50
-            self.text_image_rect.x += 50
+            self.image_rect.x += self.settings.update_magnitude
+            self.text_image_rect.x += self.settings.update_magnitude
         else:
-            self.image_rect.x -= 50
-            self.text_image_rect.x -= 50
+            self.image_rect.x -= self.settings.update_magnitude
+            self.text_image_rect.x -= self.settings.update_magnitude
 
 
 class ImageButton:
