@@ -56,11 +56,8 @@ class Menu:
         # Getting the list of ships bought:-
         with open('Data/Ship Data/is_bought.json') as is_bought:
             ships_bought = json.load(is_bought)
-        # Getting the list of ships available:-
-        with open('Data/Ship Data/is_available.json') as is_available:
-            ships_available = json.load(is_available)
 
-        return selected_ship, ships_bought, ships_available
+        return selected_ship, ships_bought
 
     def set_ship_state(self, ship_path, ship):
         """
@@ -69,7 +66,7 @@ class Menu:
         :param ship: Object
         :return: None
         """
-        selected_ship, ships_bought, ships_available = self.get_ship_data()
+        selected_ship, ships_bought = self.get_ship_data()
         # Setting the state of the ship:-
         if ship_path == selected_ship:
             ship.is_selected = True
@@ -81,11 +78,9 @@ class Menu:
         if ship_path not in ships_bought:
             # Showing the price.
             self.add_ship_text(ship)
-        if ship_path in ships_available:
-            ship.is_available = True
 
         # Adding buttons to the ships:-
-        self.add_ship_button(ship_path, ship, (selected_ship, ships_bought, ships_available))
+        self.add_ship_button(ship_path, ship, (selected_ship, ships_bought))
 
     @staticmethod
     def add_ship_text(ship):
@@ -111,7 +106,7 @@ class Menu:
         :param ship_info: Tuple
         :return: None
         """
-        selected_ship, ships_bought, ships_available = ship_info
+        selected_ship, ships_bought = ship_info
         if ship_path in ships_bought and ship_path not in selected_ship:
             ship.create_button('Game Assets/PNG/UI/buttonBlue.png', 'Select')
             ship.button.image_rect.centerx = ship.image_rect.centerx
