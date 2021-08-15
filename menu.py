@@ -3,6 +3,7 @@ import sys
 from settings import Settings
 from ship import MenuShip
 from button import ImageButton
+from powerup import PowerUp
 import json
 
 
@@ -30,8 +31,12 @@ class Menu:
         self.heading_rect.centery = self.screen_rect.top + 30
         # Creating a ship's Group:
         self.ships = pygame.sprite.Group()
+        # Creating a powerup's Group:-
+        self.powerups = pygame.sprite.Group()
         # Adding the ships to the group:-
         self.create_ship()
+        # Adding the powerups to the group:-
+        self.create_powerups()
         # Setting the font:-
         self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 15)
         # Making the cursor invisible:-
@@ -42,6 +47,33 @@ class Menu:
         self.create_buttons()
         # Creating the clock to set fps:-
         self.clock = pygame.time.Clock()
+
+    def create_powerups(self):
+        """
+        Create Powerups
+        :return: None
+        """
+        # Powerup number :-
+        powerup_number = 0
+        # Opening the file containing the paths of the powerups:-
+        with open('Data/PowerUp Data/Paths.json') as paths:
+            paths = json.load(paths)
+        # Creating the powerup objects:-
+        for path_list in paths.values():
+            for path in path_list:
+                powerup = PowerUp(str(100), path, (50, 50), 'Game Assets/PNG/UI/buttonRed.png', self.screen, (80, 80))
+                # Setting the image position:-
+                powerup.image_rect.x = 2 * powerup.image_rect.width + 4 * powerup_number * powerup.image_rect.width
+                powerup.image_rect.centery = self.screen_rect.bottom - 300
+                # Setting the background position:-
+                powerup.background_rect.centerx = powerup.image_rect.centerx
+                powerup.background_rect.centery = powerup.image_rect.centery + 20
+                self.powerups.add(powerup)
+                powerup_number += 1
+
+
+
+
 
     @staticmethod
     def get_ship_data():
@@ -134,7 +166,7 @@ class Menu:
                 ship_path = f'Game Assets/PNG/playerShip{i}_{color}.png'
                 # Making the ship.
                 ship = MenuShip(str((ship_number + 1) * 1000), ship_path, (80, 80), 'Game Assets/PNG/UI/buttonRed.png',
-                                self.screen)
+                                self.screen, (40, 150))
                 # Setting the position of the ship.
                 ship.image_rect.x = ship.image_rect.width + 2 * ship_number * ship.image_rect.width
                 ship.image_rect.y = self.screen_rect.top + 150
@@ -237,6 +269,9 @@ class Menu:
         for ship_number in range(len(self.ships)):
             var = self.ships.sprites()[ship_number]
             var.draw_ships()
+        # Showing the powerups:-
+        for powerup in self.powerups:
+            powerup.show_powerup()
         # Show fps:-
         fps_image = self.font.render(f'FPS :- {round(self.clock.get_fps())}', True, (0, 0, 0))
         fps_rect = fps_image.get_rect()
