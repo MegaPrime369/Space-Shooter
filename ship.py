@@ -18,6 +18,7 @@ class MenuShip(Ship):
         super().__init__(img_path, size)
         self.background = pygame.image.load(background_path)
         self.background = pygame.transform.scale(self.background, (size[0] + offset[0], size[1] + offset[1])).convert_alpha()
+        self.background.set_alpha(80)
         self.background_rect = self.background.get_rect()
         self.screen = screen
         self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 15)

@@ -58,22 +58,28 @@ class Menu:
         # Opening the file containing the paths of the powerups:-
         with open('Data/PowerUp Data/Paths.json') as paths:
             paths = json.load(paths)
+        # Opening the file containing the specifications of the powerups:-
+        with open('Data/PowerUp Data/powers.json') as specs:
+            powers = json.load(specs)
         # Creating the powerup objects:-
         for path_list in paths.values():
             for path in path_list:
-                powerup = PowerUp(str(100), path, (50, 50), 'Game Assets/PNG/UI/buttonRed.png', self.screen, (80, 80))
+                powerup = PowerUp(str(100), path, (50, 50), 'Game Assets/PNG/UI/buttonRed.png', self.screen, (84, 170), powers[path])
                 # Setting the image position:-
                 powerup.image_rect.x = 2 * powerup.image_rect.width + 4 * powerup_number * powerup.image_rect.width
                 powerup.image_rect.centery = self.screen_rect.bottom - 300
                 # Setting the background position:-
                 powerup.background_rect.centerx = powerup.image_rect.centerx
                 powerup.background_rect.centery = powerup.image_rect.centery + 20
+                # Setting the specs position:-
+                powerup.spec_image_rect.centerx = powerup.image_rect.centerx
+                powerup.spec_image_rect.centery = powerup.image_rect.bottom + 20
+                # Creating the text:-
+                powerup.create_divided_texts()
+                # Creating the button:-
+                powerup.create_buttons()
                 self.powerups.add(powerup)
                 powerup_number += 1
-
-
-
-
 
     @staticmethod
     def get_ship_data():
