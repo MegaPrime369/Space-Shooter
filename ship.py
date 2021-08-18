@@ -9,7 +9,7 @@ class Ship(Sprite):
         super().__init__()
         self.image_path = path
         self.image = pygame.image.load(self.image_path)
-        self.image = pygame.transform.scale(self.image, size).convert_alpha()
+        self.image = pygame.transform.smoothscale(self.image, size).convert_alpha()
         self.image_rect = self.image.get_rect()
 
 
@@ -17,8 +17,7 @@ class MenuShip(Ship):
     def __init__(self, price, img_path, size, background_path, screen, offset):
         super().__init__(img_path, size)
         self.background = pygame.image.load(background_path)
-        self.background = pygame.transform.scale(self.background, (size[0] + offset[0], size[1] + offset[1])).convert_alpha()
-        self.background.set_alpha(80)
+        self.background = pygame.transform.smoothscale(self.background, (size[0] + offset[0], size[1] + offset[1])).convert_alpha()
         self.background_rect = self.background.get_rect()
         self.screen = screen
         self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 15)

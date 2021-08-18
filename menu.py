@@ -18,7 +18,7 @@ class Menu:
         self.screen_rect = self.screen.get_rect()
         # Loading the background image:-
         self.background = pygame.image.load('Game Assets/Backgrounds/purple.png')
-        self.background = pygame.transform.scale(self.background, (
+        self.background = pygame.transform.smoothscale(self.background, (
             self.settings.screen_width, self.settings.screen_height)).convert_alpha()
         # Setting the screen caption:-
         pygame.display.set_caption(self.settings.caption)
@@ -53,18 +53,15 @@ class Menu:
         Create Powerups
         :return: None
         """
-        # Powerup number :-
         powerup_number = 0
-        # Opening the file containing the paths of the powerups:-
-        with open('Data/PowerUp Data/Paths.json') as paths:
-            paths = json.load(paths)
-        # Opening the file containing the specifications of the powerups:-
-        with open('Data/PowerUp Data/powers.json') as specs:
-            powers = json.load(specs)
+        # Getting the data of the powerups:-
+        data_files = ['Data/PowerUp Data/Paths.json', 'Data/PowerUp Data/powers.json', 'Data/PowerUp Data/numbers_bought.json']
+        powerup_data = self.get_object_data(data_files)
+        paths, powers, numbers = powerup_data[0], powerup_data[1], powerup_data[2]
         # Creating the powerup objects:-
         for path_list in paths.values():
             for path in path_list:
-                powerup = PowerUp(str(100), path, (50, 50), 'Game Assets/PNG/UI/buttonRed.png', self.screen, (84, 170), powers[path])
+                powerup = PowerUp(str(100), path, (50, 50), 'Game Assets/PNG/UI/buttonRed.png', self.screen, (95, 170), powers[path], numbers[path])
                 # Setting the image position:-
                 powerup.image_rect.x = 2 * powerup.image_rect.width + 4 * powerup_number * powerup.image_rect.width
                 powerup.image_rect.centery = self.screen_rect.bottom - 300
@@ -78,24 +75,27 @@ class Menu:
                 powerup.create_divided_texts()
                 # Creating the button:-
                 powerup.create_buttons()
+                # Creating powerup status:-
+                powerup.create_status()
                 self.powerups.add(powerup)
                 powerup_number += 1
 
     @staticmethod
-    def get_ship_data():
+    def get_object_data(files):
         """
-        Gets the data of the ships.
+        Gets the data of the objects from the given files.
         :return: None
         """
-        # Getting the status of the ships from the json files:-
-        # Getting the ship which is in use:-
-        with open('Data/Ship Data/in_use.json') as in_use:
-            selected_ship = json.load(in_use)
-        # Getting the list of ships bought:-
-        with open('Data/Ship Data/is_bought.json') as is_bought:
-            ships_bought = json.load(is_bought)
-
-        return selected_ship, ships_bought
+        # Creating a list that will store the data.
+        datas = []
+        # Opening the files and getting the data:-
+        for file in files:
+            with open(file) as data_file:
+                data = json.load(data_file)
+                # Appending the data to datas list:-
+                datas.append(data)
+        # Returning the datas list:-
+        return datas
 
     def set_ship_state(self, ship_path, ship):
         """
@@ -104,7 +104,8 @@ class Menu:
         :param ship: Object
         :return: None
         """
-        selected_ship, ships_bought = self.get_ship_data()
+        ship_data = self.get_object_data(['Data/Ship Data/in_use.json', 'Data/Ship Data/is_bought.json'])
+        selected_ship, ships_bought = ship_data[0], ship_data[1]
         # Setting the state of the ship:-
         if ship_path == selected_ship:
             ship.is_selected = True
@@ -234,7 +235,7 @@ class Menu:
         button_path = 'Game Assets/PNG/UI/buttonYellow.png'
         # Creating the button that will move the ships to left:-
         left_arrow = pygame.image.load('Game Assets/PNG/arrow.png')
-        left_arrow = pygame.transform.scale(left_arrow, arrow_size)
+        left_arrow = pygame.transform.smoothscale(left_arrow, arrow_size)
         left_arrow = pygame.transform.rotate(left_arrow, 180).convert_alpha()
         self.ship_left_button = ImageButton(self.screen, left_arrow, button_path, button_size)
         self.ship_left_button.button_rect.left = self.screen_rect.left + 10
