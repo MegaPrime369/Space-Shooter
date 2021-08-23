@@ -1,10 +1,14 @@
 import pygame
 import sys
+import json
+import time
 from settings import Settings
 from ship import MenuShip
 from button import ImageButton
 from powerup import PowerUp
-import json
+from money import Money
+from notification import NotificationWindow
+
 
 
 class Menu:
@@ -45,6 +49,17 @@ class Menu:
         self.cursor = pygame.image.load('Game Assets/PNG/UI/cursor.png')
         # Creating buttons:-
         self.create_buttons()
+        # Limiting the incrment rate of powerup when buy button is pressed:-
+        self.will_increment_powerup = True
+        self.powerup_increment_time = time.time()
+        # Getting the money available:-
+        self.amount = self.get_object_data(['Data/User Data/money.json'])[0]
+        # Creating the money status object:-
+        self.money_available = Money(self.screen, self.amount)
+        self.money_available.format_amount()
+        self.money_available.create_amount_image()
+        # Notification wii be shown or not:-
+        self.will_show_notification = False
         # Creating the clock to set fps:-
         self.clock = pygame.time.Clock()
 
@@ -208,15 +223,18 @@ class Menu:
         Respond to mouse clicks.
         :return: None
         """
+        # Getting the position of the mouse:-
+        mouse_pos = pygame.mouse.get_pos()
+        # Checks if the button in the ship has been pressed:-
         for ship in self.ships.sprites():
-            if ship.check_button_click(pygame.mouse.get_pos()):
+            if ship.check_button_click(mouse_pos):
                 if ship.is_bought and not ship.is_selected:
                     with open('Data/Ship Data/in_use.json', 'w') as selected_file:
                         json.dump(ship.image_path, selected_file)
                     self.ships.empty()
                     self.create_ship()
 
-                if not ship.is_bought:
+                if not ship.is_bought and int(ship.price) <= int(self.amount):
                     with open('Data/Ship Data/is_bought.json', 'r') as bought_file:
                         bought_list = json.load(bought_file)
                         bought_list.append(ship.image_path)
@@ -224,6 +242,35 @@ class Menu:
                         json.dump(bought_list, bought_file)
                     self.ships.empty()
                     self.create_ship()
+
+                elif int(ship.price) > int(self.amount):
+                    # Getting the notification for not having money:-
+                    self.will_show_notification = True
+                    self.no_money_notification = NotificationWindow(self.screen, 'You dont have enough money')
+                    self.no_money_notification.create_message()
+
+        if  self.will_show_notification:
+            if self.no_money_notification.check_button_click(mouse_pos):
+                self.will_show_notification = False
+
+
+            # Checks if the button in the powerup has been pressed:-
+            # Updating the will_increment_powerup after every 0.2 seconds:-
+            if time.time() - self.powerup_increment_time >= 0.2:
+                self.will_increment_powerup = True
+
+            for powerup in self.powerups.sprites():
+                if powerup.check_button_click(mouse_pos) and self.will_increment_powerup:
+                    with open('Data/PowerUp Data/numbers_bought.json') as numbers_bought:
+                        bought_dict = json.load(numbers_bought)
+                    bought_dict[powerup.image_path] += 1
+                    with open('Data/PowerUp Data/numbers_bought.json', 'w') as numbers_bought:
+                        json.dump(bought_dict, numbers_bought)
+                    powerup.number = bought_dict[powerup.image_path]
+                    powerup.create_status()
+                    self.will_increment_powerup = False
+                    self.powerup_increment_time = time.time()
+
 
     def create_buttons(self):
         """
@@ -284,11 +331,15 @@ class Menu:
         fps_rect = fps_image.get_rect()
         fps_rect.right, fps_rect.bottom = self.settings.screen_width, self.settings.screen_height
         self.screen.blit(fps_image, fps_rect)
+        # Showing the money:-
+        self.money_available.show_money()
         # Drawing the buttons:-
         self.ship_left_button.draw_image_button()
         self.ship_right_button.draw_image_button()
         # Updating the ships:-
         self.ships.update()
+        if self.will_show_notification:
+            self.no_money_notification.show_notification()
         # Showing the cursor:-
         self.screen.blit(self.cursor, pygame.mouse.get_pos())
         # Updating the display:-

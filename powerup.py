@@ -54,6 +54,15 @@ class PowerUp(MenuShip):
 		self.button_text_rect = self.button_text.get_rect()
 		self.button_text_rect.center = self.button_rect.center
 
+	def check_button_click(self, mouse_pos):
+		"""
+		Checks if the button has been clicked"
+		:param mouse_pos: Tuple
+		:return: True
+		"""
+		if self.button_rect.collidepoint(mouse_pos):
+			return True
+
 	def create_status(self):
 		"""
 		Creates images of how many powerups are bought.
