@@ -254,22 +254,22 @@ class Menu:
                 self.will_show_notification = False
 
 
-            # Checks if the button in the powerup has been pressed:-
-            # Updating the will_increment_powerup after every 0.2 seconds:-
-            if time.time() - self.powerup_increment_time >= 0.2:
-                self.will_increment_powerup = True
+        # Checks if the button in the powerup has been pressed:-
+        # Updating the will_increment_powerup after every 0.2 seconds:-
+        if time.time() - self.powerup_increment_time >= 0.2:
+            self.will_increment_powerup = True
 
-            for powerup in self.powerups.sprites():
-                if powerup.check_button_click(mouse_pos) and self.will_increment_powerup:
-                    with open('Data/PowerUp Data/numbers_bought.json') as numbers_bought:
-                        bought_dict = json.load(numbers_bought)
-                    bought_dict[powerup.image_path] += 1
-                    with open('Data/PowerUp Data/numbers_bought.json', 'w') as numbers_bought:
-                        json.dump(bought_dict, numbers_bought)
-                    powerup.number = bought_dict[powerup.image_path]
-                    powerup.create_status()
-                    self.will_increment_powerup = False
-                    self.powerup_increment_time = time.time()
+        for powerup in self.powerups.sprites():
+            if powerup.check_button_click(mouse_pos) and self.will_increment_powerup:
+                with open('Data/PowerUp Data/numbers_bought.json') as numbers_bought:
+                    bought_dict = json.load(numbers_bought)
+                bought_dict[powerup.image_path] += 1
+                with open('Data/PowerUp Data/numbers_bought.json', 'w') as numbers_bought:
+                    json.dump(bought_dict, numbers_bought)
+                powerup.number = bought_dict[powerup.image_path]
+                powerup.create_status()
+                self.will_increment_powerup = False
+                self.powerup_increment_time = time.time()
 
 
     def create_buttons(self):
