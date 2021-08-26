@@ -19,6 +19,9 @@ class MenuShip(Ship):
         self.background = pygame.image.load(background_path)
         self.background = pygame.transform.smoothscale(self.background, (size[0] + offset[0], size[1] + offset[1])).convert_alpha()
         self.background_rect = self.background.get_rect()
+        self.money = pygame.image.load('Game Assets/PNG/Power-ups/bolt_gold.png')
+        self.money = pygame.transform.smoothscale(self.money, (20, 20)).convert_alpha()
+        self.money_rect = self.money.get_rect()
         self.screen = screen
         self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 15)
         self.is_bought = False
@@ -77,6 +80,7 @@ class MenuShip(Ship):
             self.button.draw_button()
             # Showing the price:-
             self.screen.blit(self.price_image, self.price_rect)
+            self.screen.blit(self.money, self.money_rect)
 
     def update(self):
         """
@@ -93,6 +97,7 @@ class MenuShip(Ship):
             if not self.is_bought:
                 self.button.update_button(False)
                 self.price_rect.x -= self.update_magnitude
+                self.money_rect.x -= self.update_magnitude
             self.move_left = False
 
         elif self.move_right:
@@ -105,4 +110,5 @@ class MenuShip(Ship):
             if not self.is_bought:
                 self.button.update_button(True)
                 self.price_rect.x += self.update_magnitude
+                self.money_rect.x += self.update_magnitude
             self.move_right = False

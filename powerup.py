@@ -12,11 +12,27 @@ class PowerUp(MenuShip):
 		self.spec = spec
 		self.spec_font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 12)
 		self.text_font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 15)
-		self.spec_color = (89, 12, 242)
+		self.spec_color = (207, 3, 252)
 		self.button_text_color = (255, 0, 0)
 		self.spec_image = self.spec_font.render(self.spec, True, self.spec_color)
 		self.spec_image_rect = self.spec_image.get_rect()
 		self.text_broken = False
+		# Offset by which button and status will be shifted from the image:-
+		self.BTNSTATUS_OFFSETY = 100 
+		# Setting the price:-
+		self.price = price
+		# Setting the size of the money(bolt) image and price text size:=
+		MONEYSIZE = (20, 20)
+		PRICESIZE = 15
+		# Setting font for the price text :-
+		self.price_font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', PRICESIZE)
+		# Getting the money image and its rect:-
+		self.money_image = pygame.image.load('Game Assets/PNG/Power-ups/bolt_gold.png')
+		self.money_image = pygame.transform.scale(self.money_image, MONEYSIZE)
+		self.money_image_rect = self.money_image.get_rect()
+		# Getting thr image of the money text and its rect:-
+		self.price_image = self.price_font.render(str(self.price), True, (0,  0, 0))
+		self.price_image_rect = self.price_image.get_rect()
 
 	def create_divided_texts(self):
 		"""
@@ -46,11 +62,11 @@ class PowerUp(MenuShip):
 		"""
 		BUTTON_SIZE = (80, 30)
 		self.button_text = self.text_font.render('Buy', True, self.button_text_color)
-		self.button_image = pygame.image.load('Game Assets/PNG/UI/buttonGreen.png')
+		self.button_image = pygame.image.load('Game Assets/PNG/UI/buttonRed.png')
 		self.button_image = pygame.transform.smoothscale(self.button_image, BUTTON_SIZE).convert_alpha()
 		self.button_rect = self.button_image.get_rect()
 		self.button_rect.left = self.background_rect.left + 8
-		self.button_rect.centery = self.image_rect.bottom + 70
+		self.button_rect.centery = self.image_rect.bottom + self.BTNSTATUS_OFFSETY
 		self.button_text_rect = self.button_text.get_rect()
 		self.button_text_rect.center = self.button_rect.center
 
@@ -70,11 +86,11 @@ class PowerUp(MenuShip):
 		"""
 		# Creates the platform to show the number:-
 		PLATFORM_SIZE = (50, 30)
-		self.platform = pygame.image.load('Game Assets/PNG/UI/buttonGreen.png')
+		self.platform = pygame.image.load('uipack_fixed/PNG/red_button08.png')
 		self.platform = pygame.transform.smoothscale(self.platform, PLATFORM_SIZE).convert_alpha()
 		self.platform_rect = self.platform.get_rect()
 		self.platform_rect.right = self.background_rect.right - 5
-		self.platform_rect.centery = self.image_rect.bottom + 70
+		self.platform_rect.centery = self.image_rect.bottom + self.BTNSTATUS_OFFSETY
 		# Creating an image of the number:-
 		self.number_image = self.text_font.render(str(self.number), True, self.button_text_color)
 		self.number_rect = self.number_image.get_rect()
@@ -103,3 +119,6 @@ class PowerUp(MenuShip):
 		# Show to number of powerup number:-
 		self.screen.blit(self.platform, self.platform_rect)
 		self.screen.blit(self.number_image, self.number_rect)
+		# Showing the price:-
+		self.screen.blit(self.price_image, self.price_image_rect)
+		self.screen.blit(self.money_image, self.money_image_rect)

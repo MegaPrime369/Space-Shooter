@@ -6,17 +6,16 @@ class NotificationWindow:
 	def __init__(self, screen, message):
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
-		self.window = pygame.image.load('Game Assets/PNG/UI/buttonGreen.png')
+		self.window = pygame.image.load('Game Assets/PNG/UI/yellow_panel.png')
 		self.window = pygame.transform.smoothscale(self.window, (int(self.screen_rect.width / 2), int(self.screen_rect.height / 4))).convert_alpha()
 		self.window_rect = self.window.get_rect()
 		self.window_rect.center = self.screen_rect.center
 		self.font = pygame.font.Font('Game Assets/Bonus/bold font.ttf', 20)
 		self.message = message
 		self.message_parts = []
-		self.message_part_test = []
 		self.counter = 1
 		self.will_show = True
-		BUTTON_SIZE = (80, 50)
+		BUTTON_SIZE = (100, 50)
 		BUTTON_PATH = 'Game Assets/PNG/UI/buttonGreen.png'
 		self.cancel_button = Button(None, self.screen, 'Cancel', BUTTON_SIZE, BUTTON_PATH, 15)
 		self.cancel_button.image_rect.bottom = self.window_rect.bottom - 20
@@ -36,7 +35,6 @@ class NotificationWindow:
 			self.message_rect.centerx = self.window_rect.left + (i * 20) + 50
 			self.message_rect.top = self.window_rect.top + 20
 			self.message_parts.append((self.message_image, self.message_rect))
-			self.message_part_test.append(self.message[i])
 
 	def check_button_click(self, mouse_pos):
 		"""
