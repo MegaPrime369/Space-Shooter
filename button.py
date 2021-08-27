@@ -20,7 +20,7 @@ class Button:
         # Text:-
         self.text_size = text_size
         self.text = text
-        self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', self.text_size)
+        self.font = pygame.font.Font("Game Assets/Bonus/thin font.ttf", self.text_size)
         self.text_image = self.font.render(self.text, True, (235, 58, 9))
         self.text_image_rect = self.text_image.get_rect()
         # Settings:-

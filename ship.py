@@ -17,13 +17,15 @@ class MenuShip(Ship):
     def __init__(self, price, img_path, size, background_path, screen, offset):
         super().__init__(img_path, size)
         self.background = pygame.image.load(background_path)
-        self.background = pygame.transform.smoothscale(self.background, (size[0] + offset[0], size[1] + offset[1])).convert_alpha()
+        self.background = pygame.transform.smoothscale(
+            self.background, (size[0] + offset[0], size[1] + offset[1])
+        ).convert_alpha()
         self.background_rect = self.background.get_rect()
-        self.money = pygame.image.load('Game Assets/PNG/Power-ups/bolt_gold.png')
+        self.money = pygame.image.load("Game Assets/PNG/Power-ups/bolt_gold.png")
         self.money = pygame.transform.smoothscale(self.money, (20, 20)).convert_alpha()
         self.money_rect = self.money.get_rect()
         self.screen = screen
-        self.font = pygame.font.Font('Game Assets/Bonus/thin font.ttf', 15)
+        self.font = pygame.font.Font("Game Assets/Bonus/thin font.ttf", 15)
         self.is_bought = False
         self.is_selected = False
         self.has_button = False
@@ -57,7 +59,7 @@ class MenuShip(Ship):
         :return:
         """
         # Creating the 'selected' text image:-
-        self.selected_text_image = self.font.render('Selected', True, (2, 51, 184))
+        self.selected_text_image = self.font.render("Selected", True, (2, 51, 184))
         self.selected_text_rect = self.selected_text_image.get_rect()
         # Creating the price of the ship image from the text:-
         self.price_image = self.font.render(self.price, True, (0, 0, 0))
