@@ -45,7 +45,7 @@ class NotificationWindow:
         """
         Checks if the cancel button has been pressed
         :param mouse_pos: Tuple
-        :return: None
+        :return: Bool
         """
         if self.cancel_button.image_rect.collidepoint(mouse_pos):
             return True
