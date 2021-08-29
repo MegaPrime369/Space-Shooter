@@ -47,8 +47,10 @@ class NotificationWindow:
         :param mouse_pos: Tuple
         :return: Bool
         """
+        button_pressed = False
         if self.cancel_button.image_rect.collidepoint(mouse_pos):
-            return True
+            button_pressed = True
+        return button_pressed
 
     def show_notification(self):
         """
