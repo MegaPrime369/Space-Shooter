@@ -8,6 +8,7 @@ from button import Button, ImageButton
 from powerup import PowerUp
 from money import Money
 from notification import NotificationWindow
+from game import Game
 
 
 class Menu:
@@ -278,6 +279,15 @@ class Menu:
             # Moving the ship to left:-
             for ship in self.ships.sprites():
                 ship.move_left = True
+
+        # Checks if the play button has been pressed:-
+        if self.play_button.image_rect.collidepoint(mouse_pos):
+            # Playing the click sound:-
+            self.sounds["button_click"].play()
+            time.sleep(0.09)
+            # Running the game
+            game = Game()
+            game.run_game()
 
     def check_mouse_click(self):
         """

@@ -4,18 +4,31 @@ from button import Button
 from settings import Settings
 
 
-class Ship(Sprite):
-    def __init__(self, path, size):
+class PlayerShip(Sprite):
+    def __init__(self, screen, path, size):
         super().__init__()
+        self.screen = screen
         self.image_path = path
         self.image = pygame.image.load(self.image_path)
         self.image = pygame.transform.smoothscale(self.image, size).convert_alpha()
         self.image_rect = self.image.get_rect()
+        self.settings = Settings()
+        self.velocity = self.settings.player_velocity
+        self.fire = pygame.image.load('Game Assets/PNG/Effects/fire05.png').convert_alpha()
+        self.fire_rect = self.fire.get_rect()
+
+    def show_player(self):
+        """
+        Shows the player on the screen.
+        :return: None
+        """
+        self.screen.blit(self.image, self.image_rect)
+        self.screen.blit(self.fire, self.fire_rect)
 
 
-class MenuShip(Ship):
+class MenuShip(PlayerShip):
     def __init__(self, price, img_path, size, background_path, screen, offset):
-        super().__init__(img_path, size)
+        super().__init__(screen, img_path, size)
         self.background = pygame.image.load(background_path)
         self.background = pygame.transform.smoothscale(
             self.background, (size[0] + offset[0], size[1] + offset[1])
