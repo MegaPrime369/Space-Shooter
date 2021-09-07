@@ -1,8 +1,10 @@
 import pygame
+from pygame.sprite import Group
 import sys
 import json
 from settings import Settings
 from ship import PlayerShip
+from bullet import Bullet
 
 
 class Game:
@@ -48,6 +50,8 @@ class Game:
         self.player.fire_rect.centerx = self.player.image_rect.centerx
         # Fonts:-
         self.fonts = {"fps": pygame.font.Font("Game Assets/Bonus/thin font.ttf", 15)}
+        # Groups:-
+        self.player_bullets = Group()
         # Initialising the clock:-
         self.clock = pygame.time.Clock()
 
@@ -78,6 +82,39 @@ class Game:
         self.background2_rect.centery += self.player.velocity
         self.background1_rect.centery += self.player.velocity
 
+    def create_bullet(self):
+        """
+        Creates bullet for the player.
+        :retrurn: None
+        """
+        if "blue" in self.player.image_path:
+            bullet_path = "Game Assets/PNG/Lasers/laserBlue01.png"
+        elif "red" in self.player.image_path or "orange" in self.player.image_path:
+            bullet_path = "Game Assets/PNG/Lasers/laserRed01.png"
+        elif "green" in self.player.image_path:
+            bullet_path = "Game Assets/PNG/Lasers/laserGreen11.png"
+
+        bullet1 = Bullet(bullet_path, -self.settings.bullet_velocity)
+        bullet2 = Bullet(bullet_path, -self.settings.bullet_velocity)
+
+        bullet1.rect.centerx = self.player.image_rect.left + 2
+        bullet1.rect.bottom = self.player.image_rect.centery - 10
+
+        bullet2.rect.centerx = self.player.image_rect.right - 2
+        bullet2.rect.bottom = bullet1.rect.bottom
+
+        self.player_bullets.add(bullet1, bullet2)
+
+    def delete_bullets(self):
+        """
+        Deletes the bullets if they go out of screen.
+        :return: None
+        """
+        # Deleting the bullets of the player:-
+        for bullet in self.player_bullets.sprites():
+            if bullet.rect.bottom <= self.game_window_rect.top:
+                self.player_bullets.remove(bullet)
+
     def check_events(self, event):
         """
         Checking events
@@ -86,6 +123,28 @@ class Game:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                # Creating a bullet for the player:-
+                self.create_bullet()
+
+            if event.key == pygame.K_RIGHT:
+                # Turning the moving_right attribute of the player to True.
+                self.player.moving_right = True
+
+            if event.key == pygame.K_LEFT:
+                # Turning the moving_left attribute of the player to True.
+                self.player.moving_left = True
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_RIGHT:
+                # Turning the moving_right attribute of the player to False.
+                self.player.moving_right = False
+
+            if event.key == pygame.K_LEFT:
+                # Turning the moving_left attribute of the player to False.
+                self.player.moving_left = False
 
     def update_screen(self):
         """
@@ -98,6 +157,13 @@ class Game:
         self.background_animation()
         # Showing the player:-
         self.player.show_player()
+        # Showing the bullets and updating them:-
+        self.player_bullets.draw(self.game_window)
+        self.player_bullets.update()
+        # Moving the player:-
+        self.player.move_ship()
+        # Deleting unwanted bullets:-
+        self.delete_bullets()
         # Showing the mouse:-
         self.game_window.blit(self.mouse_image, pygame.mouse.get_pos())
         # Showing the fps:-

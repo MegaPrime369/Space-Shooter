@@ -4,18 +4,23 @@ from button import Button
 from settings import Settings
 
 
-class PlayerShip(Sprite):
+class PlayerShip:
     def __init__(self, screen, path, size):
         super().__init__()
         self.screen = screen
+        self.screen_rect = self.screen.get_rect()
         self.image_path = path
         self.image = pygame.image.load(self.image_path)
         self.image = pygame.transform.smoothscale(self.image, size).convert_alpha()
         self.image_rect = self.image.get_rect()
         self.settings = Settings()
         self.velocity = self.settings.player_velocity
-        self.fire = pygame.image.load('Game Assets/PNG/Effects/fire05.png').convert_alpha()
+        self.fire = pygame.image.load(
+            "Game Assets/PNG/Effects/fire05.png"
+        ).convert_alpha()
         self.fire_rect = self.fire.get_rect()
+        self.moving_right = False
+        self.moving_left = False
 
     def show_player(self):
         """
@@ -25,10 +30,23 @@ class PlayerShip(Sprite):
         self.screen.blit(self.image, self.image_rect)
         self.screen.blit(self.fire, self.fire_rect)
 
+    def move_ship(self):
+        """
+        Moves the ship left and right.
+        :return: None
+        """
+        if self.moving_right and self.image_rect.right < self.screen_rect.right:
+            self.image_rect.centerx += self.settings.player_velocity
+            self.fire_rect.centerx += self.settings.player_velocity
+        if self.moving_left and self.image_rect.left > self.screen_rect.left:
+            self.image_rect.centerx -= self.settings.player_velocity
+            self.fire_rect.centerx -= self.settings.player_velocity
 
-class MenuShip(PlayerShip):
+
+class MenuShip(Sprite, PlayerShip):
     def __init__(self, price, img_path, size, background_path, screen, offset):
-        super().__init__(screen, img_path, size)
+        PlayerShip.__init__(self, screen, img_path, size)
+        Sprite.__init__(self)
         self.background = pygame.image.load(background_path)
         self.background = pygame.transform.smoothscale(
             self.background, (size[0] + offset[0], size[1] + offset[1])

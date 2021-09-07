@@ -9,3 +9,7 @@ class Settings:
         # Player Settings:-
         self.player_velocity = 10
         self.player_ship_size = (80, 80)
+        # Alien Settings:-
+        self.alien_velocity = 10
+        # Bullet Settings:-
+        self.bullet_velocity = 15
