@@ -2,9 +2,11 @@ import pygame
 from pygame.sprite import Group
 import sys
 import json
+import random
 from settings import Settings
 from ship import PlayerShip
 from bullet import Bullet
+from alien import Alien
 
 
 class Game:
@@ -45,13 +47,17 @@ class Game:
             self.game_window, ship_path, self.settings.player_ship_size
         )
         self.player.image_rect.centerx = self.game_window_rect.centerx
-        self.player.image_rect.bottom = self.game_window_rect.bottom - 20
+        self.player.image_rect.bottom = self.game_window_rect.bottom - 60
         self.player.fire_rect.top = self.player.image_rect.bottom
         self.player.fire_rect.centerx = self.player.image_rect.centerx
+        self.player.create_healthbar()
         # Fonts:-
         self.fonts = {"fps": pygame.font.Font("Game Assets/Bonus/thin font.ttf", 15)}
         # Groups:-
         self.player_bullets = Group()
+        self.alien_group = Group()
+        # Creating the aliens:-
+        self.create_aliens()
         # Initialising the clock:-
         self.clock = pygame.time.Clock()
 
@@ -82,28 +88,33 @@ class Game:
         self.background2_rect.centery += self.player.velocity
         self.background1_rect.centery += self.player.velocity
 
-    def create_bullet(self):
+    def create_bullet(self, obj_type):
         """
         Creates bullet for the player.
+        :param obj_type: String
         :retrurn: None
         """
-        if "blue" in self.player.image_path:
-            bullet_path = "Game Assets/PNG/Lasers/laserBlue01.png"
-        elif "red" in self.player.image_path or "orange" in self.player.image_path:
-            bullet_path = "Game Assets/PNG/Lasers/laserRed01.png"
-        elif "green" in self.player.image_path:
-            bullet_path = "Game Assets/PNG/Lasers/laserGreen11.png"
+        if obj_type == 'ship':
+            if "blue" in self.player.image_path:
+                bullet_path = "Game Assets/PNG/Lasers/laserBlue01.png"
+            elif "red" in self.player.image_path or "orange" in self.player.image_path:
+                bullet_path = "Game Assets/PNG/Lasers/laserRed01.png"
+            elif "green" in self.player.image_path:
+                bullet_path = "Game Assets/PNG/Lasers/laserGreen11.png"
 
-        bullet1 = Bullet(bullet_path, -self.settings.bullet_velocity)
-        bullet2 = Bullet(bullet_path, -self.settings.bullet_velocity)
+            bullet1 = Bullet(bullet_path, -self.settings.bullet_velocity)
+            bullet2 = Bullet(bullet_path, -self.settings.bullet_velocity)
 
-        bullet1.rect.centerx = self.player.image_rect.left + 2
-        bullet1.rect.bottom = self.player.image_rect.centery - 10
+            bullet1.rect.centerx = self.player.image_rect.left + 2
+            bullet1.rect.bottom = self.player.image_rect.centery - 10
 
-        bullet2.rect.centerx = self.player.image_rect.right - 2
-        bullet2.rect.bottom = bullet1.rect.bottom
+            bullet2.rect.centerx = self.player.image_rect.right - 2
+            bullet2.rect.bottom = bullet1.rect.bottom
 
-        self.player_bullets.add(bullet1, bullet2)
+            self.player_bullets.add(bullet1, bullet2)
+
+        elif obj_type == 'alien':
+            pass
 
     def delete_bullets(self):
         """
@@ -114,6 +125,68 @@ class Game:
         for bullet in self.player_bullets.sprites():
             if bullet.rect.bottom <= self.game_window_rect.top:
                 self.player_bullets.remove(bullet)
+
+    def create_aliens(self):
+        """
+        Creates aliens.
+        :return: None
+        """
+        # Creating a test alien to get its width and height:-
+        test_alien = Alien("Game Assets/PNG/Enemies/enemyBlack1.png", self.game_window)
+        # Getting info:-
+        alien_width = test_alien.rect.width
+        alien_height = test_alien.rect.height
+        # Space in x, y:-
+        space_x = self.game_window_rect.width - 2 * alien_width
+        num_aliens_x = int(space_x / (2 * alien_width))
+        space_y = random.randint(200, 400)
+        rows_num = int(space_y / (2 * alien_height))
+        # Creating alien fleets :-
+        for row_number in range(rows_num):
+            for alien_number in range(num_aliens_x):
+                # Getting a random number, color and will_add property of the enemies:-
+                number = random.randint(1, 5)
+                color = random.choice(["Black", "Blue", "Green", "Red"])
+                will_add = random.choice([True, False])
+                # Creating the alien object and reconfiguring its position:-
+                alien = Alien(
+                    f"Game Assets/PNG/Enemies/enemy{color}{number}.png",
+                    self.game_window,
+                )
+                alien.rect.x = alien_width + 2 * alien_width * alien_number
+                alien.rect.y = (
+                    test_alien.rect.height + 2 * test_alien.rect.height * row_number
+                )
+                # Creating the healthbar:-
+                alien.create_healthbar()
+                # Adding the alien to the group:-
+                if will_add:
+                    self.alien_group.add(alien)
+
+    def check_alien_pos(self):
+        """
+        Checks if any alien of the group touches the sides.
+        :return: True
+        """
+        for alien in self.alien_group:
+            if alien.rect.right >= self.game_window_rect.right or alien.rect.left <= self.game_window_rect.left:
+                for alien in self.alien_group:
+                    alien.velocity_x *= -1
+                    alien.moving_down = True
+
+    def check_alien_bullet_collision(self):
+        """
+        Checks if the player's bullet collides with the alien.
+        :return: None
+        """
+        collisions = pygame.sprite.groupcollide(self.player_bullets, self.alien_group, True, False)
+        if collisions:
+            for aliens in collisions.values():
+                for alien in aliens:
+                    if alien.life_left == 0:
+                        self.alien_group.remove(alien)
+                    else:
+                        alien.life_left -= 1
 
     def check_events(self, event):
         """
@@ -127,7 +200,7 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 # Creating a bullet for the player:-
-                self.create_bullet()
+                self.create_bullet('ship')
 
             if event.key == pygame.K_RIGHT:
                 # Turning the moving_right attribute of the player to True.
@@ -164,6 +237,16 @@ class Game:
         self.player.move_ship()
         # Deleting unwanted bullets:-
         self.delete_bullets()
+        # Showing the aliens:-
+        self.alien_group.draw(self.game_window)
+        # Show the alien's healthbar and move them:-
+        for alien in self.alien_group.sprites():
+            alien.show_healthbar()
+            alien.update()
+        # Checking for alien, player's bullet collisions:-
+        self.check_alien_bullet_collision()
+        # Changing the direction of aliens:-
+        self.check_alien_pos()
         # Showing the mouse:-
         self.game_window.blit(self.mouse_image, pygame.mouse.get_pos())
         # Showing the fps:-

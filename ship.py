@@ -18,17 +18,40 @@ class PlayerShip:
         self.fire = pygame.image.load(
             "Game Assets/PNG/Effects/fire05.png"
         ).convert_alpha()
+        self.life_left = 5
         self.fire_rect = self.fire.get_rect()
         self.moving_right = False
         self.moving_left = False
 
-    def show_player(self):
+    def create_healthbar(self):
         """
-        Shows the player on the screen.
+        Creates health bar for the player.
         :return: None
         """
+        WIDTH, HEIGHT = 10, 5
+        self.parts = [
+            pygame.Rect(0, self.fire_rect.bottom + 10, WIDTH, HEIGHT) for _ in range(5)
+        ]
+        self.parts[2].centerx = self.image_rect.centerx
+        self.parts[1].right = self.parts[2].left
+        self.parts[0].right = self.parts[1].left
+        self.parts[3].left = self.parts[2].right
+        self.parts[4].left = self.parts[3].right
+
+    def show_player(self):
+        """
+        Shows the player and health bar on the screen.
+        :return: None
+        """
+        # Showing the player:-
         self.screen.blit(self.image, self.image_rect)
+        # Showing the fire:-
         self.screen.blit(self.fire, self.fire_rect)
+        # Showing the healthbar:-
+        for part in self.parts[: self.life_left]:
+            pygame.draw.rect(self.screen, "green", part)
+        for part in self.parts[self.life_left :]:
+            pygame.draw.rect(self.screen, "red", part)
 
     def move_ship(self):
         """
@@ -38,9 +61,13 @@ class PlayerShip:
         if self.moving_right and self.image_rect.right < self.screen_rect.right:
             self.image_rect.centerx += self.settings.player_velocity
             self.fire_rect.centerx += self.settings.player_velocity
+            for part in self.parts:
+                part.centerx += self.settings.player_velocity
         if self.moving_left and self.image_rect.left > self.screen_rect.left:
             self.image_rect.centerx -= self.settings.player_velocity
             self.fire_rect.centerx -= self.settings.player_velocity
+            for part in self.parts:
+                part.centerx -= self.settings.player_velocity
 
 
 class MenuShip(Sprite, PlayerShip):
