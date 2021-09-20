@@ -203,7 +203,8 @@ class Game:
 
     def check_bullet_collision(self):
         """
-        Checks if the player's bullet collides with the alien or alien's bullet collides with player.
+        Checks if the player's bullet collides with the alien or alien's bullet 
+        collides with player.
         :return: None
         """
         # Checking alien bullet collisions:-
